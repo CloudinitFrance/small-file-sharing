@@ -1,0 +1,199 @@
+{
+	"info": {
+		"_postman_id": "767d38d3-5a60-49d1-9f56-71a5d8ea89e4",
+		"name": "Small File Sharing App",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "28378500"
+	},
+	"item": [
+		{
+			"name": "Upload file",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{API_KEY}}",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{IdToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"file_data\": \"My File Data encoded in Base64\",\n    \"remote_file_name\": \"My File Name\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{API_BASE_URL}}/v1/users/{{USER_ID}}/files",
+					"host": [
+						"{{API_BASE_URL}}"
+					],
+					"path": [
+						"v1",
+						"users",
+						"{{USER_ID}}",
+						"files"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get User Files",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{API_KEY}}",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{IdToken}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{API_BASE_URL}}/v1/users/{{USER_ID}}/files",
+					"host": [
+						"{{API_BASE_URL}}"
+					],
+					"path": [
+						"v1",
+						"users",
+						"{{USER_ID}}",
+						"files"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete User File",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{API_KEY}}",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{IdToken}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{API_BASE_URL}}/v1/users/{{USER_ID}}/files/70ffa2f2-b106-4cbc-86c6-d5bab6959dcd",
+					"host": [
+						"{{API_BASE_URL}}"
+					],
+					"path": [
+						"v1",
+						"users",
+						"{{USER_ID}}",
+						"files",
+						"70ffa2f2-b106-4cbc-86c6-d5bab6959dcd"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Share User File",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{API_KEY}}",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer {{IdToken}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"share_with\": [\"tarek@cloudinit.fr\", \"tarek@lostinmac.com\"]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{API_BASE_URL}}/v1/users/{{USER_ID}}/files/70ffa2f2-b106-4cbc-86c6-d5bab6959dcd/share",
+					"host": [
+						"{{API_BASE_URL}}"
+					],
+					"path": [
+						"v1",
+						"users",
+						"{{USER_ID}}",
+						"files",
+						"70ffa2f2-b106-4cbc-86c6-d5bab6959dcd",
+						"share"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
