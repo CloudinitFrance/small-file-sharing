@@ -1,0 +1,4 @@
+COGNITO_USER_POOL_ID={{CognitoApi User Pool ID}}
+FILE_SHARING_TABLE=thecadors-files
+REGION={{Your AWS Region}}
+USER_FILES_BUCKET=thecadors-file-sharing-dev

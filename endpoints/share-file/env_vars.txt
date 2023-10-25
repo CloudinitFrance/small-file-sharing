@@ -1,0 +1,6 @@
+COGNITO_USER_POOL_ID={{CognitoApi User Pool ID}}
+FILE_SHARING_TABLE=thecadors-files
+REGION={{Your AWS Region}}
+USER_FILES_BUCKET=thecadors-file-sharing-dev
+SENDER_EMAIL={{The email to use to share a file link with a user, must be configured inside AWS SES service}}
+SENDER_SES_ARN={{The ARN of SENDER_EMAIL}}
