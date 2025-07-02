@@ -1,145 +1,170 @@
-# SmallFileSharing
+# 🚀 SmallFileSharing - Serverless File Sharing on AWS
 
-Small File Sharing is a demo on how to share files using a REST API based on AWS API Gateway, secured by AWS Cognito and using AWS S3 for files storage.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![AWS](https://img.shields.io/badge/AWS-Serverless-orange)](https://aws.amazon.com/)
+[![Python](https://img.shields.io/badge/Python-3.8%2B-blue)](https://www.python.org/)
 
-## Pre-requisites
+> A production-ready serverless file sharing solution built on AWS, featuring enterprise-grade security with Cognito authentication, RESTful API design, and automatic email notifications.
 
-This demo needs to be used with:
+## 🎯 Key Features
 
-- [CognitoApi](https://github.com/CloudinitFrance/cognito-api/): An authentication API based on AWS Cognito.
+- **🔒 Secure Authentication**: JWT-based authentication via AWS Cognito
+- **📁 File Management**: Upload, list, delete, and share files up to 10MB
+- **📧 Email Notifications**: Automatic email delivery with time-limited download links
+- **🏗️ Serverless Architecture**: Zero infrastructure management with automatic scaling
+- **💰 Cost-Effective**: Pay only for what you use with AWS Lambda
+- **🔗 RESTful API**: Clean, intuitive API design with comprehensive documentation
 
+## 🏛️ Architecture Overview
 
-## Installation
+```
+┌─────────────┐     ┌──────────────┐     ┌─────────────┐
+│   Client    │────▶│ API Gateway  │────▶│   Lambda    │
+└─────────────┘     └──────────────┘     └─────────────┘
+                            │                     │
+                            ▼                     ▼
+                    ┌──────────────┐     ┌─────────────┐
+                    │   Cognito    │     │  DynamoDB   │
+                    └──────────────┘     └─────────────┘
+                                                 │
+                                                 ▼
+                                         ┌─────────────┐
+                                         │     S3      │
+                                         └─────────────┘
+                                                 │
+                                                 ▼
+                                         ┌─────────────┐
+                                         │     SES     │
+                                         └─────────────┘
+```
 
-> **Warning**
-First you need to install **CognitoApi** by follwing the [installation guide](https://github.com/CloudinitFrance/cognito-api#installation).
+## 🚀 Quick Start
 
-And then you can create the following AWS resources:
+### Prerequisites
 
-- Create an S3 bucket to store the files. Let's give it a name: **thecadors-file-sharing-dev**.
+- AWS Account with appropriate permissions
+- [CognitoApi](https://github.com/CloudinitFrance/cognito-api/) installed and configured
+- Python 3.8+ for local development
+- AWS CLI configured
 
-- Create a DynamoDB table named: **thecadors-files** with a **Partition key** named: **file_id**. This table will keep track of all the user files. 
+### Installation
 
-- Create a lambda named **upload-file** and use the code provided inside this reposirory, set the timeout for this lambda to 30 seconds and associate to it a PowerUserAccess role. Set the environement variables specified inside the file **env_vars.txt**
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/CloudinitFrance/small-file-sharing.git
+   cd small-file-sharing
+   ```
 
-- Create a lambda named **get-user-files** and use the code provided inside this reposirory, set the timeout for this lambda to 30 seconds and associate to it a PowerUserAccess role. Set the environement variables specified inside the file **env_vars.txt**
+2. **Deploy CognitoApi** (if not already done)
+   ```bash
+   # Follow the CognitoApi installation guide
+   # https://github.com/CloudinitFrance/cognito-api#installation
+   ```
 
-- Create a lambda named **delete-user-file** and use the code provided inside this reposirory, set the timeout for this lambda to 30 seconds and associate to it a PowerUserAccess role. Set the environement variables specified inside the file **env_vars.txt**
+3. **Create AWS Resources**
+   
+   Use our automated setup script or follow the manual steps:
+   
+   ```bash
+   # Coming soon: Terraform/CloudFormation templates
+   ```
 
-- Create a lambda named **share-file** and use the code provided inside this reposirory, set the timeout for this lambda to 30 seconds and associate to it a PowerUserAccess role. Set the environement variables specified inside the file **env_vars.txt**
+   **Manual Setup:**
+   - S3 Bucket: `your-file-sharing-bucket-name`
+   - DynamoDB Table: `your-files-table` (partition key: `file_id`)
+   - Lambda Functions: Deploy all 4 functions from `/endpoints`
+   - API Gateway: Configure routes as specified below
 
-- Associate with all the created lambdas 2 AWS Lambda layers coming from the deployment of the CognitoApi project which are: **pyjwt** and **jsonschema**.
+## 📚 API Documentation
 
-- Create a resource named **files** inside the API Gateway deployed by the **CognitoApi** project under the path: **/users/{user_id}/**, so the path of this resource will be: **/users/{user_id}/files**.
+### Authentication
+All endpoints require:
+- `x-api-key` header
+- `Authorization: Bearer {IdToken}` header
 
-- Create a **GET** method under the resource **/users/{user_id}/files** and use **Use Lambda Proxy integration** as an integration with lambda **get-user-files**. Use as an authorization the authorizer deployed by the **CognitoApi** project and set **API Key Required** to true.
+### Endpoints
 
-- Create a **POST** method under the resource **/users/{user_id}/files** and use **Use Lambda Proxy integration** as an integration with lambda **upload-file**. Use as an authorization the authorizer deployed by the **CognitoApi** project and set **API Key Required** to true.
+#### 📤 Upload File
+```http
+POST /v1/users/{user_id}/files
+Content-Type: application/json
 
-- Create a resource named **{file_id}** inside the API Gateway deployed by the **CognitoApi** project under the path: **/users/{user_id}/files**, so the path of this resource will be: **/users/{user_id}/files/{file_id}**.
-
-- Create a **DELETE** method under the resource **/users/{user_id}/files/{file_id}** and use **Use Lambda Proxy integration** as an integration with lambda **delete-user-file**. Use as an authorization the authorizer deployed by the **CognitoApi** project and set **API Key Required** to true.
-
-- Create a resource named **share** inside the API Gateway deployed by the **CognitoApi** project under the path: **/users/{user_id}/files/{file_id}**, so the path of this resource will be: **/users/{user_id}/files/{file_id}/share**.
-
-- Create a **POST** method under the resource **/users/{user_id}/files/{file_id}/share** and use **Use Lambda Proxy integration** as an integration with lambda **share-file**. Use as an authorization the authorizer deployed by the **CognitoApi** project and set **API Key Required** to true.
-
-## API Documentation
-
-> **Warning**
-All endpoints needs the header: x-api-key which must be set by generating an API Key inside your AWS Api Gateway and associate it with your deployment stage and a usage plan.
-
-You can find a Postman collection here: **postman/Small_File_Sharing_App.postman_collection.json**. You need to set the following variables inside Postman:
-
-- **API_BASE_URL**: which is the dns name to use to call your auth api.
-
-- **API_KEY**: should be the one that you will generate for your tests inside the API Gateway.
-
-- **IdToken**: that you can get from the **CognitoApi** once connected.
-
-Let's see how this API works:
-
-- **Upload a new file**: Use a **POST** method on the endpoint: **v1/users/{{USER_ID}}/files** with the payload:
-
-```json
 {
-    "file_data": "iVBORw0KGgoAAAANSUhEUgAAB0QAAANiCAYAAADxNXqHAAAMP2lDQ1BJQ0MgUHJvZml8Am4",
-    "remote_file_name": "TheCadors.png"
+  "file_data": "base64_encoded_data",
+  "remote_file_name": "document.pdf"
 }
 ```
 
-> **Warning**
-Note here, that **file_data** is the file data encoded in base64, the size of the file cannot exceed **10MB** because it's the limit that the AWS API Gateway can support as a payload.
+#### 📋 List Files
+```http
+GET /v1/users/{user_id}/files
+```
 
-And you will get an answer that looks like this:
+#### 🗑️ Delete File
+```http
+DELETE /v1/users/{user_id}/files/{file_id}
+```
 
-```json
+#### 📨 Share File
+```http
+POST /v1/users/{user_id}/files/{file_id}/share
+Content-Type: application/json
+
 {
-    "file_id": "70ffa2f2-b106-4cbc-86c6-d5bab6959dcd",
-    "status": "UPLOADED"
+  "share_with": ["email1@example.com", "email2@example.com"]
 }
 ```
 
-![Upload a new file API Call](https://github.com/CloudinitFrance/small-file-sharing/blob/main/assets/UploadFile.png?raw=true)
+## 🛠️ Development
 
-- **List user files**: Use a **GET** method on the endpoint: **v1/users/{{USER_ID}}/files**, you will get an answer that looks like this:
-
-```json
-{
-    "user_id": "a24554c4-e0d1-7099-6e19-ccf5c6ed29dd",
-    "user_files": [
-        {
-            "file_id": "ac63e42f-b46b-4291-a690-0d1e63ece3a6",
-            "file_name": "TheCadorsApi.drawio"
-        },
-        {
-            "file_id": "70ffa2f2-b106-4cbc-86c6-d5bab6959dcd",
-            "file_name": "TheCadors.png"
-        }
-    ]
-}
+### Project Structure
+```
+small-file-sharing/
+├── endpoints/
+│   ├── upload-file/
+│   ├── get-user-files/
+│   ├── delete-user-file/
+│   └── share-file/
+├── postman/
+└── README.md
 ```
 
-![List User Files API Call](https://github.com/CloudinitFrance/small-file-sharing/blob/main/assets/GetUserFiles.png?raw=true)
+### Testing
+Import the Postman collection from `/postman` directory and configure:
+- `API_BASE_URL`: Your API Gateway URL
+- `API_KEY`: Your generated API key
+- `IdToken`: From CognitoApi authentication
 
-- **Share a file**: Use a **POST** method on the endpoint: **v1/users/{{USER_ID}}/files/{{file_id}}/share** with the payload:
+## 🔒 Security Features
 
-```json
-{
-    "share_with": ["tarek@cloudinit.fr", "tarek@lostinmac.com"]
-}
-```
+- JWT validation on every request
+- User isolation (users can only access their own files)
+- Time-limited presigned URLs (1 hour expiry)
+- API key requirement for additional security
+- Input validation using JSON schemas
 
-And you will get an answer that looks like this:
+## 🚧 Roadmap
 
-```json
-{
-    "file_id": "70ffa2f2-b106-4cbc-86c6-d5bab6959dcd",
-    "file_name": "TheCadors.png",
-    "status": "SHARED"
-}
-```
+- [ ] Infrastructure as Code templates (Terraform/CloudFormation)
+- [ ] Support for larger files
+- [ ] File encryption at rest
+- [ ] File sharing permissions management
 
-After this call, all the emails with who you share the file, will receive an email containing a download link valid for 1 hour.
+## 🤝 Contributing
 
-![Share a File API Call](https://github.com/CloudinitFrance/small-file-sharing/blob/main/assets/ShareFile.png?raw=true)
-![Share a File Email Link](https://github.com/CloudinitFrance/small-file-sharing/blob/main/assets/FileSharing-Email.png?raw=true)
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-- **Delete a file**: Use a **DELETE** method on the endpoint: **v1/users/{{USER_ID}}/files/{{file_id}}** and you will get an answer that looks like this:
+## 📄 License
 
-And you will get an answer that looks like this:
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/CloudinitFrance/small-file-sharing/blob/main/LICENSE) file for details.
 
-```json
-{
-    "user_id": "a24554c4-e0d1-7099-6e19-ccf5c6ed29dd",
-    "file_id": "70ffa2f2-b106-4cbc-86c6-d5bab6959dcd",
-    "file_name": "TheCadors.png",
-    "file_status": "DELETED"
-}
-```
+## 👨‍💻 Author
 
-![Delete a File API Call](https://github.com/CloudinitFrance/small-file-sharing/blob/main/assets/DeleteFile.png?raw=true)
+**Tarek CHEIKH**
+- GitHub: [@CloudinitFrance](https://github.com/CloudinitFrance)
+- LinkedIn: [Tarek CHEIKH](https://fr.linkedin.com/in/tarekouldcheikh)
+- Website: [cloudinit.fr](https://cloudinit.fr)
 
-## License
+---
 
-[Mozilla Public License v2.0](https://github.com/CloudinitFrance/small-file-sharing/blob/main/LICENSE)
+⭐ If you find this project useful, please consider giving it a star on GitHub!
